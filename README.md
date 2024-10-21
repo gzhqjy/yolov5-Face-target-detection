@@ -1,170 +1,463 @@
-<a href="https://apps.apple.com/app/id1452689527" target="_blank">
-<img src="https://user-images.githubusercontent.com/26833433/98699617-a1595a00-2377-11eb-8145-fc674eb9b1a7.jpg" width="1000"></a>
-&nbsp
+# YOLO v5——目标检测
 
-<a href="https://github.com/ultralytics/yolov5/actions"><img src="https://github.com/ultralytics/yolov5/workflows/CI%20CPU%20testing/badge.svg" alt="CI CPU testing"></a>
+## 项目介绍和环境配置
 
-This repository represents Ultralytics open-source research into future object detection methods, and incorporates lessons learned and best practices evolved over thousands of hours of training and evolution on anonymized client datasets. **All code and models are under active development, and are subject to modification or deletion without notice.** Use at your own risk.
+![image-20240912151719437](img/image-20240912151719437.png)
 
-<p align="center"><img width="800" src="https://user-images.githubusercontent.com/26833433/114313216-f0a5e100-9af5-11eb-8445-c682b60da2e3.png"></p>
-<details>
-  <summary>YOLOv5-P5 640 Figure (click to expand)</summary>
-  
-<p align="center"><img width="800" src="https://user-images.githubusercontent.com/26833433/114313219-f1d70e00-9af5-11eb-9973-52b1f98d321a.png"></p>
-</details>
-<details>
-  <summary>Figure Notes (click to expand)</summary>
-  
-  * GPU Speed measures end-to-end time per image averaged over 5000 COCO val2017 images using a V100 GPU with batch size 32, and includes image preprocessing, PyTorch FP16 inference, postprocessing and NMS. 
-  * EfficientDet data from [google/automl](https://github.com/google/automl) at batch size 8.
-  * **Reproduce** by `python test.py --task study --data coco.yaml --iou 0.7 --weights yolov5s6.pt yolov5m6.pt yolov5l6.pt yolov5x6.pt`
-</details>
+![image-20240912153131274](img/image-20240912153131274.png)
 
-- **April 11, 2021**: [v5.0 release](https://github.com/ultralytics/yolov5/releases/tag/v5.0): YOLOv5-P6 1280 models, [AWS](https://github.com/ultralytics/yolov5/wiki/AWS-Quickstart), [Supervise.ly](https://github.com/ultralytics/yolov5/issues/2518) and [YouTube](https://github.com/ultralytics/yolov5/pull/2752) integrations.
-- **January 5, 2021**: [v4.0 release](https://github.com/ultralytics/yolov5/releases/tag/v4.0): nn.SiLU() activations, [Weights & Biases](https://wandb.ai/site?utm_campaign=repo_yolo_readme) logging, [PyTorch Hub](https://pytorch.org/hub/ultralytics_yolov5/) integration.
-- **August 13, 2020**: [v3.0 release](https://github.com/ultralytics/yolov5/releases/tag/v3.0): nn.Hardswish() activations, data autodownload, native AMP.
-- **July 23, 2020**: [v2.0 release](https://github.com/ultralytics/yolov5/releases/tag/v2.0): improved model definition, training and mAP.
+可以搜索一些协议去链接摄像头，实现实时检测
 
+![image-20240912153442715](img/image-20240912153442715.png)
 
-## Pretrained Checkpoints
+将要检测的照片放入
 
-[assets]: https://github.com/ultralytics/yolov5/releases
+![image-20240913083103816](img/image-20240913083103816.png)
 
-Model |size<br><sup>(pixels) |mAP<sup>val<br>0.5:0.95 |mAP<sup>test<br>0.5:0.95 |mAP<sup>val<br>0.5 |Speed<br><sup>V100 (ms) | |params<br><sup>(M) |FLOPS<br><sup>640 (B)
----   |---  |---        |---         |---             |---                |---|---              |---
-[YOLOv5s][assets]    |640  |36.7     |36.7     |55.4     |**2.0** | |7.3   |17.0
-[YOLOv5m][assets]    |640  |44.5     |44.5     |63.3     |2.7     | |21.4  |51.3
-[YOLOv5l][assets]    |640  |48.2     |48.2     |66.9     |3.8     | |47.0  |115.4
-[YOLOv5x][assets]    |640  |**50.4** |**50.4** |**68.8** |6.1     | |87.7  |218.8
-| | | | | | || |
-[YOLOv5s6][assets]   |1280 |43.3     |43.3     |61.9     |**4.3** | |12.7  |17.4
-[YOLOv5m6][assets]   |1280 |50.5     |50.5     |68.7     |8.4     | |35.9  |52.4
-[YOLOv5l6][assets]   |1280 |53.4     |53.4     |71.1     |12.3    | |77.2  |117.7
-[YOLOv5x6][assets]   |1280 |**54.4** |**54.4** |**72.0** |22.4    | |141.8 |222.9
-| | | | | | || |
-[YOLOv5x6][assets] TTA |1280 |**55.0** |**55.0** |**72.0** |70.8 | |-  |-
+## YoLo V5 模型检测
 
-<details>
-  <summary>Table Notes (click to expand)</summary>
-  
-  * AP<sup>test</sup> denotes COCO [test-dev2017](http://cocodataset.org/#upload) server results, all other AP results denote val2017 accuracy.  
-  * AP values are for single-model single-scale unless otherwise noted. **Reproduce mAP** by `python test.py --data coco.yaml --img 640 --conf 0.001 --iou 0.65`  
-  * Speed<sub>GPU</sub> averaged over 5000 COCO val2017 images using a GCP [n1-standard-16](https://cloud.google.com/compute/docs/machine-types#n1_standard_machine_types) V100 instance, and includes FP16 inference, postprocessing and NMS. **Reproduce speed** by `python test.py --data coco.yaml --img 640 --conf 0.25 --iou 0.45`  
-  * All checkpoints are trained to 300 epochs with default settings and hyperparameters (no autoaugmentation). 
-  * Test Time Augmentation ([TTA](https://github.com/ultralytics/yolov5/issues/303)) includes reflection and scale augmentation. **Reproduce TTA** by `python test.py --data coco.yaml --img 1536 --iou 0.7 --augment`
-</details>
+![image-20240913145337311](img/image-20240913145337311.png)
 
+![image-20240913145934289](img/image-20240913145934289.png)
 
-## Requirements
+![image-20240913150154404](img/image-20240913150154404.png)
 
-Python 3.8 or later with all [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) dependencies installed, including `torch>=1.7`. To install run:
-```bash
-$ pip install -r requirements.txt
-```
+![image-20240913150354564](img/image-20240913150354564.png)
 
+说明：torch.hub是一种加载数据集权重的方法，由于模型保存本地，所以采用了上面的方式设置权重
 
-## Tutorials
+注意：我在跑代码的过程中发现由于yolov5版本落后，而我们所装的pytorch已经领先版本太多，所以此时只有两个处理方法：
 
-* [Train Custom Data](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data)&nbsp; 🚀 RECOMMENDED
-* [Tips for Best Training Results](https://github.com/ultralytics/yolov5/wiki/Tips-for-Best-Training-Results)&nbsp; ☘️ RECOMMENDED
-* [Weights & Biases Logging](https://github.com/ultralytics/yolov5/issues/1289)&nbsp; 🌟 NEW
-* [Supervisely Ecosystem](https://github.com/ultralytics/yolov5/issues/2518)&nbsp; 🌟 NEW
-* [Multi-GPU Training](https://github.com/ultralytics/yolov5/issues/475)
-* [PyTorch Hub](https://github.com/ultralytics/yolov5/issues/36)&nbsp; ⭐ NEW
-* [ONNX and TorchScript Export](https://github.com/ultralytics/yolov5/issues/251)
-* [Test-Time Augmentation (TTA)](https://github.com/ultralytics/yolov5/issues/303)
-* [Model Ensembling](https://github.com/ultralytics/yolov5/issues/318)
-* [Model Pruning/Sparsity](https://github.com/ultralytics/yolov5/issues/304)
-* [Hyperparameter Evolution](https://github.com/ultralytics/yolov5/issues/607)
-* [Transfer Learning with Frozen Layers](https://github.com/ultralytics/yolov5/issues/1314)&nbsp; ⭐ NEW
-* [TensorRT Deployment](https://github.com/wang-xinyu/tensorrtx)
+1.修改源代码
 
+2.增加图像数据处理操作
 
-## Environments
+由于源代码过于繁琐，牵扯到的变量数量众多，所以采用了方式二
 
-YOLOv5 may be run in any of the following up-to-date verified environments (with all dependencies including [CUDA](https://developer.nvidia.com/cuda)/[CUDNN](https://developer.nvidia.com/cudnn), [Python](https://www.python.org/) and [PyTorch](https://pytorch.org/) preinstalled):
-
-- **Google Colab and Kaggle** notebooks with free GPU: <a href="https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> <a href="https://www.kaggle.com/ultralytics/yolov5"><img src="https://kaggle.com/static/images/open-in-kaggle.svg" alt="Open In Kaggle"></a>
-- **Google Cloud** Deep Learning VM. See [GCP Quickstart Guide](https://github.com/ultralytics/yolov5/wiki/GCP-Quickstart)
-- **Amazon** Deep Learning AMI. See [AWS Quickstart Guide](https://github.com/ultralytics/yolov5/wiki/AWS-Quickstart)
-- **Docker Image**. See [Docker Quickstart Guide](https://github.com/ultralytics/yolov5/wiki/Docker-Quickstart) <a href="https://hub.docker.com/r/ultralytics/yolov5"><img src="https://img.shields.io/docker/pulls/ultralytics/yolov5?logo=docker" alt="Docker Pulls"></a>
-
-
-## Inference
-
-`detect.py` runs inference on a variety of sources, downloading models automatically from the [latest YOLOv5 release](https://github.com/ultralytics/yolov5/releases) and saving results to `runs/detect`.
-```bash
-$ python detect.py --source 0  # webcam
-                            file.jpg  # image 
-                            file.mp4  # video
-                            path/  # directory
-                            path/*.jpg  # glob
-                            'https://youtu.be/NUsoVlDFqZg'  # YouTube video
-                            'rtsp://example.com/media.mp4'  # RTSP, RTMP, HTTP stream
-```
-
-To run inference on example images in `data/images`:
-```bash
-$ python detect.py --source data/images --weights yolov5s.pt --conf 0.25
-
-Namespace(agnostic_nms=False, augment=False, classes=None, conf_thres=0.25, device='', exist_ok=False, img_size=640, iou_thres=0.45, name='exp', project='runs/detect', save_conf=False, save_txt=False, source='data/images/', update=False, view_img=False, weights=['yolov5s.pt'])
-YOLOv5 v4.0-96-g83dc1b4 torch 1.7.0+cu101 CUDA:0 (Tesla V100-SXM2-16GB, 16160.5MB)
-
-Fusing layers... 
-Model Summary: 224 layers, 7266973 parameters, 0 gradients, 17.0 GFLOPS
-image 1/2 /content/yolov5/data/images/bus.jpg: 640x480 4 persons, 1 bus, Done. (0.010s)
-image 2/2 /content/yolov5/data/images/zidane.jpg: 384x640 2 persons, 1 tie, Done. (0.011s)
-Results saved to runs/detect/exp2
-Done. (0.103s)
-```
-<img src="https://user-images.githubusercontent.com/26833433/97107365-685a8d80-16c7-11eb-8c2e-83aac701d8b9.jpeg" width="500">  
-
-### PyTorch Hub
-
-To run **batched inference** with YOLOv5 and [PyTorch Hub](https://github.com/ultralytics/yolov5/issues/36):
-```python
+~~~python
 import torch
+import os
+import numpy as np
 
-# Model
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+# 确保模型路径存在
+model_path = r'runs/train/exp10/weights/best.pt'
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"模型文件未找到: {model_path}")
 
-# Images
-dir = 'https://github.com/ultralytics/yolov5/raw/master/data/images/'
-imgs = [dir + f for f in ('zidane.jpg', 'bus.jpg')]  # batch of images
+# 加载模型
+model = torch.hub.load('.', 'custom', model_path, source='local')
 
-# Inference
-results = model(imgs)
-results.print()  # or .show(), .save()
-```
+# 指定图像路径
+img_path = r'data/images/bus.jpg'
+if not os.path.exists(img_path):
+    raise FileNotFoundError(f"图像文件未找到: {img_path}")
 
+# 进行推理
+results = model(img_path, augment=False)
 
-## Training
+# 确保结果图像是可写的
+for i in range(len(results.imgs)):
+    results.imgs[i] = np.array(results.imgs[i]).copy()  # 创建可写副本
 
-Run commands below to reproduce results on [COCO](https://github.com/ultralytics/yolov5/blob/master/data/scripts/get_coco.sh) dataset (dataset auto-downloads on first use). Training times for YOLOv5s/m/l/x are 2/4/6/8 days on a single V100 (multi-GPU times faster). Use the largest `--batch-size` your GPU allows (batch sizes shown for 16 GB devices).
-```bash
-$ python train.py --data coco.yaml --cfg yolov5s.yaml --weights '' --batch-size 64
-                                         yolov5m                                40
-                                         yolov5l                                24
-                                         yolov5x                                16
-```
-<img src="https://user-images.githubusercontent.com/26833433/90222759-949d8800-ddc1-11ea-9fa1-1c97eed2b963.png" width="900">
-
-
-## Citation
-
-[![DOI](https://zenodo.org/badge/264818686.svg)](https://zenodo.org/badge/latestdoi/264818686)
+# 打印和显示结果
+results.print()
+results.show()
+~~~
 
 
-## About Us
 
-Ultralytics is a U.S.-based particle physics and AI startup with over 6 years of expertise supporting government, academic and business clients. We offer a wide range of vision AI services, spanning from simple expert advice up to delivery of fully customized, end-to-end production solutions, including:
-- **Cloud-based AI** systems operating on **hundreds of HD video streams in realtime.**
-- **Edge AI** integrated into custom iOS and Android apps for realtime **30 FPS video inference.**
-- **Custom data training**, hyperparameter evolution, and model exportation to any destination.
+## YOLOv5 数据集构建
 
-For business inquiries and professional support requests please visit us at https://www.ultralytics.com. 
+![image-20240913150726595](img/image-20240913150726595.png)
+
+## YOLOv5模型训练
+
+![image-20240913151959875](img/image-20240913151959875.png)
+
+![image-20240913152007403](img/image-20240913152007403.png)
+
+![image-20240913152351737](img/image-20240913152351737.png)
+
+## 数据集说明
+
+我使用的数据集是自制数据集，通过lux下载了一个哔哩哔哩视频
+
+![image-20240914205224421](img/image-20240914205224421.png)
+
+然后进行了抽帧的操作
+
+~~~python
+import cv2
+import matplotlib.pyplot as plt
+
+# 打开视频文件
+video = cv2.VideoCapture("video01.mp4")
+# 读取一帧
+# ret,frame = video.read()
+
+# plt.imshow(cv2.cvtColor(frame,cv2.COLOR_BGR2RGB))
+
+# 抽取视频帧
+num = 0
+save_step = 30
+while True:
+    ret,frame = video.read()
+    if not ret:
+        break
+    num += 1
+    if num % save_step == 0:
+        cv2.imwrite("images" + str(num) + ".jpg",frame)
+~~~
+
+之后形成的文件经过筛选形成初步图片数据集
+
+然后对图片进行标签注释
+
+通过labelimg（通过pip在虚拟环境中安装使用）进行标注，标注文件命名为labels
+
+数据集制作好后按照指定的方式进行数据集处理（因为数据集量小，所以直接在文件夹上进行数据集的划分，如果数据集数量大，应当参考下面的处理方式）
+
+~~~python
+# 这个数据集采用了Kaggle上面经典的二分类数据集进行制作，原始数据集只有cats和dogs两个文件夹
+import os
+import shutil
+import sys
+import torch
+import torchvision
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+from PIL import Image
+import torch.nn as nn
+from model import *
+
+# 判断可用设备
+device = torch.device("cuda:0" if torch.cuda.is_availabsle() else "cpu")
+print("using {} device.".format(device))
+
+# 数据集路径
+dataset_path = "PetImages"
+output_path = "Cats_and_Dogs"
+
+# 创建数据文件夹
+os.makedirs(os.path.join(output_path, 'train', 'Cat'), exist_ok=True)
+os.makedirs(os.path.join(output_path, 'train', 'Dog'), exist_ok=True)
+os.makedirs(os.path.join(output_path, 'val', 'Cat'), exist_ok=True)
+os.makedirs(os.path.join(output_path, 'val', 'Dog'), exist_ok=True)
+os.makedirs(os.path.join(output_path, 'test', 'Cat'), exist_ok=True)
+os.makedirs(os.path.join(output_path, 'test', 'Dog'), exist_ok=True)
+
+# 复制图像的函数
+def copy_images(imgs, src_folder, dest_folder):
+    for img in imgs:
+        src_path = os.path.join(src_folder, img)
+        new_path = os.path.join(dest_folder, img)
+        try:
+            shutil.copy(src_path, new_path)
+        except Exception as e:
+            print(f"Error copying {src_path}: {e}")
+
+# 复制训练、验证和测试集
+cat_img_folder = os.path.join(dataset_path, 'Cat')
+dog_img_folder = os.path.join(dataset_path, 'Dog')
+
+cat_imgs = sorted(os.listdir(cat_img_folder))
+dog_imgs = sorted(os.listdir(dog_img_folder))
+
+cat_num = int(len(cat_imgs))
+cat_train = cat_imgs[0:int(0.8 * cat_num)]
+cat_val = cat_train[0:int(0.2 * len(cat_train))]
+cat_test = cat_imgs[int(0.8 * cat_num):]
+
+dog_num = int(len(dog_imgs))
+dog_train = dog_imgs[0:int(0.8 * dog_num)]
+dog_val = dog_train[0:int(0.2 * len(dog_train))]
+dog_test = dog_imgs[int(0.8 * dog_num):]
+
+copy_images(cat_test, cat_img_folder, os.path.join(output_path, 'test', 'Cat'))
+copy_images(dog_test, dog_img_folder, os.path.join(output_path, 'test', 'Dog'))
+copy_images(cat_train, cat_img_folder, os.path.join(output_path, 'train', 'Cat'))
+copy_images(dog_train, dog_img_folder, os.path.join(output_path, 'train', 'Dog'))
+copy_images(cat_val, cat_img_folder, os.path.join(output_path, 'val', 'Cat'))
+copy_images(dog_val, dog_img_folder, os.path.join(output_path, 'val', 'Dog'))
 
 
-## Contact
+# 自定义数据集类以处理图像加载异常
+class CustomImageFolder(datasets.ImageFolder):
+    def __getitem__(self, index):
+        path, target = self.samples[index]
+        try:
+            sample = self.loader(path)
+            # 转换为张量
+            sample = self.transform(sample) if self.transform is not None else sample
+        except (IOError, OSError, Image.UnidentifiedImageError) as e:
+            print(f"Error loading image {path}: {e}")
+            # 返回一个全零的张量和默认标签
+            return torch.zeros(3, 224, 224), target  # 假设图像大小为224x224，通道数为3
+        return sample, target
 
-**Issues should be raised directly in the repository.** For business inquiries or professional support requests please visit https://www.ultralytics.com or email Glenn Jocher at glenn.jocher@ultralytics.com. 
+# 数据预处理
+transforms_train = transforms.Compose([
+    transforms.Resize([224, 224]),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+transforms_test = transforms.Compose([
+    transforms.Resize([224, 224]),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+transforms_val = transforms.Compose([
+    transforms.Resize([224, 224]),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+# 创建数据集和数据加载器
+train_set = CustomImageFolder(root=os.path.join(output_path, "train"), transform=transforms_train)
+train_dataloader = DataLoader(train_set, batch_size=64, shuffle=True)
+
+test_set = CustomImageFolder(root=os.path.join(output_path, "test"), transform=transforms_test)
+test_dataloader = DataLoader(test_set, batch_size=64, shuffle=True)
+
+val_set = CustomImageFolder(root=os.path.join(output_path, "val"), transform=transforms_val)
+val_dataloader = DataLoader(val_set, batch_size=64, shuffle=True)
+~~~
+
+数据集处理好后训练数据集共有465张，测试数据集有100张（放在了dataset文件中）
+
+## 模型训练说明
+
+模型训练主要在train.py中进行
+
+![image-20240914211224233](img/image-20240914211224233.png)
+
+首先改写了coco128.yaml文件（这是模型的预训练文件），形成bvn.yaml文件
+
+~~~python
+path: dataset
+train: ./dataset/images/train/  # 128 images
+val: ./dataset/images/val/  # 128 images
+nc : 1
+
+# class names
+names: [ 'Person']
+~~~
+
+再在train.py文件中进行参数的设置
+
+![image-20240914211511843](img/image-20240914211511843.png)
+
+重点修改了训练的模型权重，yaml文件的存放位置，训练轮数
+
+然后开始训练即可
+
+在训练过程中由于numpy版本过高导致训练错误
+
+以下有两种解决方式
+
+1.降低numpy版本
+
+2.修改源代码，将报错（主要是在np.int，修改为int或者是int32/64即可，使用pycharm的全局定位即可找到）修改为符合现代版本的程序
+
+推荐使用第二种方法，因为将numpy版本降低后会引发一系列例如pandas和plt等包的版本不适配的问题，只能重新重装环境
+
+![image-20240914212015366](img/image-20240914212015366.png)
+
+模型训练后会得到weights文件，里面包含了最佳训练结果和最近一次的训练结果（权重）
+
+## GUI界面制作
+
+近几年，受益于人工智能的崛起，Python语言几乎以压倒性优势在众多编程语言中异军突起，成为AI时代的首选语言。在很多情况下，我们想要以图形化方式将我们的人工智能算法打包提供给用户使用，这时候选择以python为主的GUI框架就非常合适了。
+
+QT是众多GUI框架里面非常著名的一款，它本身由C++开发，天然支持基于C++的GUI编程，编出来的图形化软件在当今众多GUI框架中运行效率几乎是天花板级别的，拥有完善的第三方库，极其适合数字图像处理、文档排版、多媒体、3D建模等专业软件开发。与此同时，QT还有一个强大的功能：支持跨平台，简单来理解，就是我们只需要编写一套代码就可以同时在windows、mac、linux上运行。
+
+因为我选择的是pycharm，所以如果有使用jupyter编辑器的自行搜索解决安装QT的方法
+
+具体pycharm环境下安装pyside6的方法在这里
+
+[PyCharm下安装配置PySide6开发环境（Qt Designer(打开，编辑)、PyUIC和PyRCC）_pycharm配置pyside6-CSDN博客](https://blog.csdn.net/mengenqing/article/details/132489529)
+
+安装后通过
+
+Pyside6 QtDesinger进行图形化界面制作
+
+![image-20240914212554855](img/image-20240914212554855.png)
+
+然后将*.ui文件放入项目文件夹中，通过pyside6-uic处理成python文件（在设计图形化界面时可以通过属性管理器更改变量的名字，方便在项目后续中使用）
+
+~~~python
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'main_window.ui'
+##
+## Created by: Qt User Interface Compiler version 6.7.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QMainWindow,
+    QPushButton, QSizePolicy, QStatusBar, QWidget)
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        if not MainWindow.objectName():
+            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.resize(988, 428)
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.input = QLabel(self.centralwidget)
+        self.input.setObjectName(u"input")
+        self.input.setGeometry(QRect(130, 50, 301, 231))
+        self.input.setScaledContents(True)
+        self.input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.output = QLabel(self.centralwidget)
+        self.output.setObjectName(u"output")
+        self.output.setGeometry(QRect(560, 50, 321, 231))
+        self.output.setScaledContents(True)
+        self.output.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.line = QFrame(self.centralwidget)
+        self.line.setObjectName(u"line")
+        self.line.setGeometry(QRect(460, 30, 61, 291))
+        self.line.setFrameShape(QFrame.Shape.VLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+        self.dec_image = QPushButton(self.centralwidget)
+        self.dec_image.setObjectName(u"dec_image")
+        self.dec_image.setGeometry(QRect(200, 350, 151, 41))
+        self.dec_video = QPushButton(self.centralwidget)
+        self.dec_video.setObjectName(u"dec_video")
+        self.dec_video.setGeometry(QRect(680, 350, 151, 41))
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.statusbar = QStatusBar(MainWindow)
+        self.statusbar.setObjectName(u"statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+
+        QMetaObject.connectSlotsByName(MainWindow)
+    # setupUi
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.input.setText(QCoreApplication.translate("MainWindow", u"\u663e\u793a\u539f\u59cb\u56fe\u7247", None))
+        self.output.setText(QCoreApplication.translate("MainWindow", u"\u663e\u793a\u68c0\u6d4b\u7ed3\u679c", None))
+        self.dec_image.setText(QCoreApplication.translate("MainWindow", u"\u56fe\u7247\u68c0\u6d4b", None))
+        self.dec_video.setText(QCoreApplication.translate("MainWindow", u"\u89c6\u9891\u68c0\u6d4b", None))
+    # retranslateUi
+~~~
+
+依据这段代码中的关键参数
+
+![image-20240914212852784](img/image-20240914212852784.png)
+
+我们进行可视化界面的制作
+
+~~~python
+import sys
+import numpy as np
+import torch
+import cv2
+from PySide6.QtWidgets import QMainWindow, QApplication, QFileDialog, QLabel, QPushButton
+from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtCore import QTimer
+from main_window import Ui_MainWindow
+
+def convert2QImage(img):
+    height, width, channel = img.shape
+    return QImage(img, width, height, width * channel, QImage.Format_RGB888)
+
+class MainWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.setupUi(self)
+        # 加载模型
+        self.model = torch.hub.load("./", 'custom', "runs/train/exp10/weights/best.pt", source='local')
+        self.capture = None  # 用于视频捕获
+        self.timer = QTimer()  # 定时器
+        self.bind_slots()
+
+    def image_pred(self, file_path):
+        result = self.model(file_path, augment=False)
+
+        # 确保结果图像是可写的
+        for i in range(len(result.imgs)):
+            result.imgs[i] = np.array(result.imgs[i]).copy()  # 创建可写副本
+
+        image = result.render()[0]  # 获取渲染后的图像
+        return convert2QImage(image)
+
+    # 打开图片
+    def open_image(self):
+        print("点击了检测图片")
+        file_path = QFileDialog.getOpenFileName(self, dir="./data/images", filter="*.jpg;*.png;*.jpeg")
+        if file_path[0]:
+            file_path = file_path[0]
+            qimage = self.image_pred(file_path)
+            self.input.setPixmap(QPixmap(file_path))
+            self.output.setPixmap(QPixmap.fromImage(qimage))
+
+    # 打开视频
+    def open_video(self):
+        print("点击了检测视频")
+        self.capture = cv2.VideoCapture(0)  # 打开默认摄像头
+        if not self.capture.isOpened():
+            print("无法打开摄像头")
+            return
+
+        self.timer.timeout.connect(self.update_frame)  # 绑定定时器到更新帧的方法
+        self.timer.start(30)  # 每30毫秒更新一次
+
+    def update_frame(self):
+        ret, frame = self.capture.read()  # 从摄像头读取一帧
+        if ret:
+            # 将 BGR 转换为 RGB
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # 进行检测
+            result = self.model(frame_rgb, augment=False)
+            for i in range(len(result.imgs)):
+                result.imgs[i] = np.array(result.imgs[i]).copy()  # 创建可写副本
+
+            # 获取检测后的图像
+            detected_image = result.render()[0]
+            qimage = convert2QImage(detected_image)
+
+            # 显示原始视频帧和检测结果
+            self.input.setPixmap(QPixmap.fromImage(convert2QImage(frame_rgb)))
+            self.output.setPixmap(QPixmap.fromImage(qimage))
+
+    def closeEvent(self, event):
+        if self.capture is not None:
+            self.capture.release()  # 释放摄像头
+        event.accept()  # 接受关闭事件
+
+    # 绑定槽
+    def bind_slots(self):
+        self.dec_image.clicked.connect(self.open_image)
+        self.dec_video.clicked.connect(self.open_video)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+    window.show()
+
+    app.exec()
+~~~
+
+![image-20240914213040845](img/image-20240914213040845.png)
+
+点击即可运行
+
